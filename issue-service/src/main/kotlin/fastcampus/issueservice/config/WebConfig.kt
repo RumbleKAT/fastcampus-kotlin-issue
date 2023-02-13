@@ -23,6 +23,7 @@ class AuthUserHandlerArgumentResolver: HandlerMethodArgumentResolver{
 
     override fun supportsParameter(parameter: MethodParameter): Boolean =
         AuthUser::class.java.isAssignableFrom(parameter.parameterType)
+    // controller 인자에 authuser를 받으면, resolveArgument를 전달한다.
 
     override fun resolveArgument(
         parameter: MethodParameter,
