@@ -17,5 +17,31 @@ class CoroutineCacheManager<T> {
         localCache.remove(key)
     }
 
+    suspend fun awaitGetOrPut(
+        key: String,
+        ttl: Duration? = Duration.ofMinutes(5),
+        supplier: suspend ()-> T,
+        ) : T {
+        //키가 존재했을때 suspend 함수 수행 suspend
+        val now = Instant.now()
+        val cacheWrapper = localCache[key]
+
+        val cached = if(cacheWrapper == null){
+            CacheWrapper(cached = supplier(), ttl = now.plusMillis(ttl!!.toMillis())).also {
+                localCache[key] = it
+            }
+        }else if(now.isAfter(cacheWrapper.ttl)){
+            // 캐시 ttl이 지난 경우
+            localCache.remove(key)
+            CacheWrapper(cached = supplier(),ttl = now.plusMillis(ttl!!.toMillis())).also {
+                localCache[key] = it
+            }
+        }else{
+            cacheWrapper
+        }
+        checkNotNull(cached.cached)
+        return cached.cached
+    }
+
     data class  CacheWrapper<T>(val cached: T, val ttl: Instant)
 }
