@@ -59,7 +59,7 @@ class UserController(
             filename = "${id}.${ext}" //1.jpg 3.png
 
             //resources/images/1.jpg
-            val file = File(ClassPathResource("/images").file, filename)
+            val file = File(ClassPathResource("/images/").file, filename)
             filePart.transferTo(file).awaitSingleOrNull()
         }
         userService.edit(token, request.username, filename)
